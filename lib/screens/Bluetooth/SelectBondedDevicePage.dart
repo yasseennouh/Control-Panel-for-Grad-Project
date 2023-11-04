@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bluetooth_serial/flutter_bluetooth_serial.dart';
 import 'package:collection/collection.dart';
 import './BluetoothDeviceListEntry.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 class SelectBondedDevicePage extends StatefulWidget {
   /// If true, on page start there is performed discovery upon the bonded devices.
@@ -130,7 +131,32 @@ class _SelectBondedDevicePage extends State<SelectBondedDevicePage> {
               title: TextButton(
                 child: const Text('Start Discovery'),
                 onPressed: () async {
-                  _startDiscovery();
+
+                  PermissionStatus status = await Permission.location.request();
+                  if (status.isGranted) {
+                    _startDiscovery();
+                  } else {
+                      Future<void> _showAlertDialog(BuildContext context) async {
+                        await showDialog<void>(
+                          context: context,
+                          builder: (BuildContext context) {
+                            return AlertDialog(
+                              title: Text('Bluetooth Error'),
+                              content: Text('Please Allow Bluetooth to be connected'),
+                              actions: <Widget>[
+                                TextButton(
+                                  onPressed: () {
+                                    Navigator.of(context).pop(); // Close the dialog
+              },
+              child: Text('OK'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+                  }
                 },
               ),
             ),
