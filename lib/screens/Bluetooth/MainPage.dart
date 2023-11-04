@@ -4,7 +4,7 @@ import 'package:flutter_bluetooth_serial/flutter_bluetooth_serial.dart';
 import './communication.dart';
 import './SelectBondedDevicePage.dart';
 import './ChatPage.dart';
-//import './ChatPage2.dart';
+
 
 
 class MainPage extends StatefulWidget {
