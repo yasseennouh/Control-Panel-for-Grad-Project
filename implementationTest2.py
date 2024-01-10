@@ -1,0 +1,115 @@
+import RPi.GPIO as GPIO
+import dht11
+import time
+from Adafruit_CharLCD import Adafruit_CharLCD
+
+# Define GPIO pins
+DHT_PIN = 17  # GPIO pin for DHT sensor
+RELAY1_PIN = 27
+RELAY2_PIN = 22
+LED_PINS = [18, 23, 24, 25]
+MOTOR1_PINS = [20, 21]
+MOTOR2_PINS = [16, 12]
+
+# Initialize GPIO
+GPIO.setmode(GPIO.BCM)
+GPIO.setup(DHT_PIN, GPIO.IN)
+GPIO.setup(RELAY1_PIN, GPIO.OUT)
+GPIO.setup(RELAY2_PIN, GPIO.OUT)
+for pin in LED_PINS + MOTOR1_PINS + MOTOR2_PINS:
+    GPIO.setup(pin, GPIO.OUT)
+
+# Initialize DHT sensor
+dht_sensor = dht11.DHT11(pin=DHT_PIN)
+
+# Initialize LCD
+lcd = Adafruit_CharLCD(rs=26, en=19,
+                       d4=13, d5=6, d6=5, d7=11,
+                       cols=16, lines=2)
+
+def is_printable(c):
+    return 32 <= ord(c) <= 126
+
+try:
+    while True:
+        result = dht_sensor.read()
+        
+        if result.is_valid():
+            lcd.clear()
+            lcd.message(f"Temperature: {result.temperature} C\n")
+            lcd.message(f"Humidity: {result.humidity} %")
+
+            if result.temperature >= 22:
+                GPIO.output(RELAY1_PIN, GPIO.LOW)
+            elif result.temperature <= 20:
+                GPIO.output(RELAY1_PIN, GPIO.HIGH)
+
+        if GPIO.input(RELAY1_PIN) == GPIO.LOW:
+            lcd.set_cursor = (1, 15)
+            lcd.message("AC: OFF")
+        else:
+            lcd.set_cursor = (1, 15)
+            lcd.message("AC: ON")
+
+        #if GPIO.input(RELAY2_PIN) == GPIO.LOW:
+         #   lcd.cursor_pos = (1, 0)
+         #   lcd.message("Lights: OFF")
+
+        cmd = input("Enter command: ")
+
+        if cmd.isdigit():
+            cmd = int(cmd)
+            if cmd == 0:
+                GPIO.output(LED_PINS + MOTOR1_PINS + MOTOR2_PINS, GPIO.LOW)
+                GPIO.output(RELAY1_PIN, GPIO.LOW)
+                print("All devices turned off")
+            elif cmd == 1 or cmd == 2:
+                GPIO.output(LED_PINS[2 * (cmd - 1)], GPIO.HIGH)
+                GPIO.output(LED_PINS[2 * (cmd - 1) + 1], GPIO.HIGH)
+                print(f"Light row {cmd}: ON")
+                #lcd.message("Light row 1: ON")
+            elif 3 <= cmd <= 4:
+                GPIO.output(LED_PINS[2 * (cmd - 3)], GPIO.LOW)
+                GPIO.output(LED_PINS[2 * (cmd - 3) + 1], GPIO.LOW)
+                print(f"Light row {cmd - 2}: OFF")
+            elif 5 <= cmd <= 8:
+                GPIO.output(RELAY1_PIN, GPIO.LOW)
+                GPIO.output(RELAY2_PIN, GPIO.LOW)
+                print("AC: OFF")
+            elif cmd == 9:
+                GPIO.output(MOTOR1_PINS[0], GPIO.LOW)
+                GPIO.output(MOTOR1_PINS[1], GPIO.HIGH)
+                time.sleep(5)
+                GPIO.output(MOTOR1_PINS, GPIO.LOW)
+                print("Curtains down")
+            elif cmd == 10:
+                GPIO.output(MOTOR1_PINS[0], GPIO.HIGH)
+                GPIO.output(MOTOR1_PINS[1], GPIO.LOW)
+                time.sleep(5)
+                GPIO.output(MOTOR1_PINS, GPIO.LOW)
+                print("Curtains up")
+            elif cmd == 11:
+                GPIO.output(MOTOR2_PINS[0], GPIO.HIGH)
+                GPIO.output(MOTOR2_PINS[1], GPIO.LOW)
+                time.sleep(5)
+                GPIO.output(MOTOR2_PINS, GPIO.LOW)
+                print("Projector mat down")
+            elif cmd == 12:
+                GPIO.output(MOTOR2_PINS[0], GPIO.LOW)
+                GPIO.output(MOTOR2_PINS[1], GPIO.HIGH)
+                time.sleep(5)
+                GPIO.output(MOTOR2_PINS, GPIO.LOW)
+                print("Projector mat up")
+            else:
+                print("Invalid command")
+                
+        lcd.clear()
+        lcd.message("command: " + str(cmd))
+
+except KeyboardInterrupt:
+    pass
+
+finally:
+    GPIO.cleanup()
+
+# pip install RPi.GPIO dht11 RPLCD

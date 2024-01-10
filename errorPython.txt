@@ -1,0 +1,12 @@
+Traceback (most recent call last):
+  File "/home/ibrahimwaleed7/Desktop/projectimplementionFULLPython.py", line 26, in <module>
+    lcd = CharLCD(i2c_expander='PCF8574', address=0x27)
+  File "/usr/local/lib/python3.9/dist-packages/RPLCD/i2c.py", line 166, in __init__
+    super(CharLCD, self).__init__(cols, rows, dotsize,
+  File "/usr/local/lib/python3.9/dist-packages/RPLCD/lcd.py", line 103, in __init__
+    self.command(0x03)
+  File "/usr/local/lib/python3.9/dist-packages/RPLCD/lcd.py", line 382, in command
+    self._send_instruction(value)
+  File "/usr/local/lib/python3.9/dist-packages/RPLCD/i2c.py", line 240, in _send_instruction
+    self.bus.write_byte(self._address, (c.RS_INSTRUCTION |
+OSError: [Errno 121] Remote I/O error
