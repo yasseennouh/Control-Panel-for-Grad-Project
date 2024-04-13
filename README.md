@@ -43,7 +43,7 @@ We welcome contributions from the community to improve the Smart Classroom Manag
 4. Push to the branch: git push origin feature/my-new-feature
 5. Submit a pull request.
 
-## Documentation (Diagrams, workflow, test cases, SDLC)
+## Documentation (Diagrams, Workflow, Test cases, SDLC, Code)
 
 [Drive Link](https://drive.google.com/drive/folders/1GUr0nFOqF_oy7Co1SKeZ8stxMMpvTH8P?usp=sharing)
 
